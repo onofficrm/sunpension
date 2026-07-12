@@ -1,0 +1,57 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: sunpension-ftp-deploy
+  cancel-in-progress: true
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Inject Google Maps API key
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          perl -pi -e 's/JS_MAPS_API_KEY/$ENV{GOOGLE_MAPS_API_KEY}/g' plugin/editor/cheditor5/popup/google_map.html
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          parallel: 1
+          protocol: ftp
+          local-dir: ./
+          server-dir: /public_html/
+          state-name: sunpension-deploy-v1
+          log-level: minimal
+          timeout: 600000
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/.DS_Store
+            **/.vscode/**
+            **/._*
+            _backup_transfer_*/
+            **/_backup_transfer_*/
+            _BUILDER_INPUT/**
+            data/**
+            cache/**
+            session/**
+            tmp/**
+            *.log
+            .env
+            .env.*
