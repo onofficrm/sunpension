@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: sunpension-ftp-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   ftp-deploy:
@@ -18,6 +18,44 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: builder/poolvila/package-lock.json
+
+      - name: Build poolvila (Google Studio → dist)
+        run: |
+          cd builder/poolvila
+          npm ci
+          npm run build
+          test -f dist/index.html
+          test -n "$(ls dist/assets/*.js 2>/dev/null | head -1)"
+          rm -rf ../../plugin/onoff-builder-bridge/imports/poolvila/assets
+          cp dist/index.html ../../plugin/onoff-builder-bridge/imports/poolvila/
+          cp -R dist/assets ../../plugin/onoff-builder-bridge/imports/poolvila/
+          cp public/logo.svg ../../plugin/onoff-builder-bridge/imports/poolvila/
+          echo "poolvila bundle: $(find ../../plugin/onoff-builder-bridge/imports/poolvila -type f | wc -l) files"
+
+      - name: Prepare core deploy bundle
+        run: |
+          rm -rf .deploy/core
+          mkdir -p .deploy/core/plugin/onoff-builder-bridge/data
+          mkdir -p .deploy/core/api/board/list .deploy/core/api/board/view
+          mkdir -p .deploy/core/api/chat .deploy/core/api/itinerary
+          mkdir -p .deploy/core/lib .deploy/core/extend
+          cp index.php _site.config.php poolvila-board-install.php .deploy/core/
+          cp plugin/onoff-builder-bridge/data/imports.json .deploy/core/plugin/onoff-builder-bridge/data/
+          cp -R api/board .deploy/core/api/
+          cp -R api/chat .deploy/core/api/
+          cp -R api/itinerary .deploy/core/api/
+          cp api/.htaccess .deploy/core/api/
+          cp lib/poolvila-board-api.lib.php lib/poolvila-gemini-api.lib.php .deploy/core/lib/
+          cp extend/poolvila.extend.php .deploy/core/extend/
+          find .deploy/core -name '._*' -delete 2>/dev/null || true
+          echo "core bundle: $(find .deploy/core -type f | wc -l) files"
 
       - name: Clean junk files before upload
         run: |
@@ -30,7 +68,35 @@ jobs:
         run: |
           perl -pi -e 's/JS_MAPS_API_KEY/$ENV{GOOGLE_MAPS_API_KEY}/g' plugin/editor/cheditor5/popup/google_map.html
 
-      - name: Deploy via FTP
+      - name: Deploy poolvila bundle first (fast)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: plugin/onoff-builder-bridge/imports/poolvila/
+          server-dir: /public_html/plugin/onoff-builder-bridge/imports/poolvila/
+          state-name: sunpension-poolvila-v2
+          log-level: minimal
+          timeout: 600000
+
+      - name: Deploy site config + APIs + home
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: .deploy/core/
+          server-dir: /public_html/
+          state-name: sunpension-core-v2
+          log-level: minimal
+          timeout: 600000
+
+      - name: Deploy full site (incremental)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -40,18 +106,20 @@ jobs:
           protocol: ftp
           local-dir: ./
           server-dir: /public_html/
-          state-name: sunpension-deploy-v1
+          state-name: sunpension-deploy-v2
           log-level: minimal
           timeout: 600000
           exclude: |
             **/.git*
             **/.github/**
+            **/.deploy/**
             **/.DS_Store
             **/.vscode/**
             **/._*
             _backup_transfer_*/
             **/_backup_transfer_*/
             _BUILDER_INPUT/**
+            builder/**
             docs/**
             plugin/auto_comment/packages/**
             data/**

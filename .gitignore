@@ -23,6 +23,7 @@ _BUILDER_INPUT/
 node_modules/
 builder/**/node_modules/
 builder/**/dist/
+.deploy/
 .env
 .env.*
 
