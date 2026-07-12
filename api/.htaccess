@@ -11,3 +11,7 @@ RewriteRule ^builder-deploy/manifest/?$ builder-deploy/manifest/index.php [L,QSA
 RewriteRule ^builder-deploy/file/?$ builder-deploy/file/index.php [L,QSA]
 RewriteRule ^builder-deploy/publish/?$ builder-deploy/publish/index.php [L,QSA]
 RewriteRule ^builder-deploy/build-source/?$ builder-deploy/build-source/index.php [L,QSA]
+RewriteRule ^board/list/?$ board/list/index.php [L,QSA]
+RewriteRule ^board/view/?$ board/view/index.php [L,QSA]
+RewriteRule ^chat/?$ chat/index.php [L,QSA]
+RewriteRule ^itinerary/?$ itinerary/index.php [L,QSA]

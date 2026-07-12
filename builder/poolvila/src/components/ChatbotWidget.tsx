@@ -42,7 +42,7 @@ export default function ChatbotWidget() {
       if (res.ok) {
         setMessages(prev => [...prev, { role: 'model', text: data.reply }]);
       } else {
-        setMessages(prev => [...prev, { role: 'model', text: '죄송합니다. 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' }]);
+        setMessages(prev => [...prev, { role: 'model', text: data.error || data.reply || '죄송합니다. 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' }]);
       }
     } catch (error) {
       setMessages(prev => [...prev, { role: 'model', text: '네트워크 오류가 발생했습니다.' }]);
