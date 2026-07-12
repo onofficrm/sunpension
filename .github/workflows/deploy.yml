@@ -13,11 +13,16 @@ concurrency:
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 360
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Clean junk files before upload
+        run: |
+          find . -name '._*' -delete 2>/dev/null || true
+          find . -name '.DS_Store' -delete 2>/dev/null || true
 
       - name: Inject Google Maps API key
         env:
@@ -32,7 +37,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          parallel: 1
           protocol: ftp
           local-dir: ./
           server-dir: /public_html/
@@ -48,6 +52,8 @@ jobs:
             _backup_transfer_*/
             **/_backup_transfer_*/
             _BUILDER_INPUT/**
+            docs/**
+            plugin/auto_comment/packages/**
             data/**
             cache/**
             session/**
