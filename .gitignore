@@ -21,6 +21,8 @@ _BUILDER_INPUT/
 
 # Node·환경
 node_modules/
+builder/**/node_modules/
+builder/**/dist/
 .env
 .env.*
 

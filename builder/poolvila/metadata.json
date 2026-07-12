@@ -1,0 +1,6 @@
+{
+  "name": "세부풀빌라",
+  "description": "필리핀 세부시티와 막탄 지역의 풀빌라를 소개하고 상담으로 연결하는 프리미엄 세부풀빌라 전문 사이트",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

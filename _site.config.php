@@ -8,27 +8,27 @@ if (!defined('_GNUBOARD_')) {
 }
 
 $site_config = array(
-    'site_name'           => '샘플 사이트',
-    'site_desc'           => '빌더 디자인 적용이 쉬운 그누보드 베이스 템플릿',
-    'company_name'        => '회사명',
+    'site_name'           => '세부풀빌라',
+    'site_desc'           => '필리핀 세부시티와 막탄 지역의 풀빌라를 소개하고 상담으로 연결하는 프리미엄 세부풀빌라 전문 사이트',
+    'company_name'        => '세부풀빌라',
     'ceo_name'            => '대표자명',
     'business_no'         => '000-00-00000',
     'phone'               => '010-0000-0000',
-    'kakao_url'           => '#',
+    'kakao_url'           => 'https://pf.kakao.com/',
     'email'               => 'help@example.com',
-    'address'             => '주소를 입력하세요',
-    'primary_color'       => '#2563eb',
-    'secondary_color'     => '#64748b',
+    'address'             => 'Cebu, Philippines',
+    'primary_color'       => '#10B981',
+    'secondary_color'     => '#0F172A',
     'logo_path'           => '/img/logo/logo.svg',
     'og_image'            => '/img/common/og-image.jpg',
     /* SEO (components/seo-meta.php) */
-    'seo_title'           => '',
-    'seo_description'     => '',
-    'main_keyword'        => '',
-    'sub_keywords'        => '',
+    'seo_title'           => '세부풀빌라 | 세부시티·막탄 프라이빗 풀빌라',
+    'seo_description'     => '세부시티와 막탄의 프라이빗 풀빌라를 지역, 인원과 여행 목적에 맞게 확인하고 상담받아보세요.',
+    'main_keyword'        => '세부풀빌라, 막탄풀빌라, 세부시티풀빌라',
+    'sub_keywords'        => '세부가족여행, 세부단체숙소, 세부프라이빗풀빌라, 세부여행숙소, 세부골프여행숙소',
     'robots'              => 'index,follow',
     'consultation_text'   => '상담문의',
-    'footer_desc'         => '고객의 성장을 돕는 웹사이트 제작 베이스입니다.',
+    'footer_desc'         => '세부시티와 막탄의 프라이빗 풀빌라 정보를 안내합니다.',
     /* 문의 폼 → inquiry 게시판 (proc/inquiry-submit.php) */
     'inquiry_bo_table'        => 'inquiry',
     'inquiry_notify_enabled'  => true,
@@ -109,7 +109,7 @@ $site_config = array(
     'icrm_hub_enabled'          => true,
     'icrm_hub_geo_button'       => true,
     /* onoff-builder-bridge — 루트 / 를 빌더 페이지로 (project_id) */
-    'home_builder_bridge_id'    => '',
+    'home_builder_bridge_id'    => 'poolvila',
 );
 
 /**
