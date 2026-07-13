@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: sunpension-ftp-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   ftp-deploy:
@@ -37,25 +37,7 @@ jobs:
           cp dist/index.html ../../plugin/onoff-builder-bridge/imports/poolvila/
           cp -R dist/assets ../../plugin/onoff-builder-bridge/imports/poolvila/
           cp public/logo.svg ../../plugin/onoff-builder-bridge/imports/poolvila/
-          echo "poolvila bundle: $(find ../../plugin/onoff-builder-bridge/imports/poolvila -type f | wc -l) files"
-
-      - name: Prepare core deploy bundle
-        run: |
-          rm -rf .deploy/core
-          mkdir -p .deploy/core/plugin/onoff-builder-bridge/data
-          mkdir -p .deploy/core/api/board/list .deploy/core/api/board/view
-          mkdir -p .deploy/core/api/chat .deploy/core/api/itinerary
-          mkdir -p .deploy/core/lib .deploy/core/extend
-          cp index.php _site.config.php poolvila-board-install.php .deploy/core/
-          cp plugin/onoff-builder-bridge/data/imports.json .deploy/core/plugin/onoff-builder-bridge/data/
-          cp -R api/board .deploy/core/api/
-          cp -R api/chat .deploy/core/api/
-          cp -R api/itinerary .deploy/core/api/
-          cp api/.htaccess .deploy/core/api/
-          cp lib/poolvila-board-api.lib.php lib/poolvila-gemini-api.lib.php .deploy/core/lib/
-          cp extend/poolvila.extend.php .deploy/core/extend/
-          find .deploy/core -name '._*' -delete 2>/dev/null || true
-          echo "core bundle: $(find .deploy/core -type f | wc -l) files"
+          echo "poolvila: $(ls -la ../../plugin/onoff-builder-bridge/imports/poolvila/assets/)"
 
       - name: Clean junk files before upload
         run: |
@@ -68,35 +50,27 @@ jobs:
         run: |
           perl -pi -e 's/JS_MAPS_API_KEY/$ENV{GOOGLE_MAPS_API_KEY}/g' plugin/editor/cheditor5/popup/google_map.html
 
-      - name: Deploy poolvila bundle first (fast)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          local-dir: plugin/onoff-builder-bridge/imports/poolvila/
-          server-dir: /public_html/plugin/onoff-builder-bridge/imports/poolvila/
-          state-name: sunpension-poolvila-v2
-          log-level: minimal
-          timeout: 600000
+      - name: Check FTP port reachable
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq netcat-openbsd >/dev/null
+          port="${FTP_PORT:-21}"
+          echo "FTP target: ${FTP_SERVER}:${port}"
+          for i in 1 2 3; do
+            if nc -zv -w 15 "$FTP_SERVER" "$port"; then
+              echo "FTP port open (attempt $i)"
+              exit 0
+            fi
+            echo "retry in 20s..."
+            sleep 20
+          done
+          echo "::error::FTP 서버(${FTP_SERVER}:${port})에 연결할 수 없습니다. 호스팅 FTP 허용 IP·포트·서비스 상태를 확인하세요."
+          exit 1
 
-      - name: Deploy site config + APIs + home
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          local-dir: .deploy/core/
-          server-dir: /public_html/
-          state-name: sunpension-core-v2
-          log-level: minimal
-          timeout: 600000
-
-      - name: Deploy full site (incremental)
+      - name: Deploy via FTP (single session)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
