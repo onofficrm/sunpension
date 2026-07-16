@@ -29,9 +29,9 @@ export default function BoardVilla({ region, wrId }: BoardVillaProps) {
       <div className="cebuvilla-board-detail bg-brand-beige min-h-screen pb-20">
         <div className="bg-white border-b border-gray-100 pb-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-            <button type="button" onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-gray-500 hover:text-brand-navy mb-6 transition-colors font-medium">
+            <a href={`/bbs/board.php?bo_table=${region}`} className="inline-flex items-center gap-2 text-gray-500 hover:text-brand-navy mb-6 transition-colors font-medium">
               <ArrowLeft className="w-4 h-4" /> 목록으로
-            </button>
+            </a>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <div className="space-y-4">
@@ -86,8 +86,11 @@ export default function BoardVilla({ region, wrId }: BoardVillaProps) {
     );
   }
 
+  const noticeItems = items.filter((item) => item.is_notice);
+  const villaItems = items.filter((item) => !item.is_notice);
+
   return (
-    <div className="cebuvilla-board-list bg-white min-h-screen pb-20">
+    <div className="cebuvilla-board-list bg-brand-beige min-h-screen pb-20">
       <div className="bg-brand-navy text-white py-16 px-4 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop')] opacity-20 bg-cover bg-center"></div>
         <div className="relative z-10">
@@ -133,10 +136,32 @@ export default function BoardVilla({ region, wrId }: BoardVillaProps) {
         </div>
 
         {loading && <p className="text-gray-500 mb-8">풀빌라 목록을 불러오는 중...</p>}
-        {error && <p className="text-gray-500 mb-8">{error}</p>}
+        {error && <p className="text-rose-600 mb-8 bg-rose-50 border border-rose-100 rounded-xl px-4 py-3 text-sm">{error}</p>}
+
+        {noticeItems.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-orange-100 overflow-hidden mb-8">
+            <div className="px-5 py-3 border-b border-orange-50 bg-brand-orange/5">
+              <p className="text-sm font-bold text-brand-orange">공지 · 상단 고정</p>
+            </div>
+            <ul className="divide-y divide-gray-100">
+              {noticeItems.map((item) => (
+                <li key={item.wr_id} className="hover:bg-brand-orange/10">
+                  <a
+                    href={`/bbs/board.php?bo_table=${region}&wr_id=${item.wr_id}`}
+                    className="flex items-center gap-3 px-5 py-4"
+                  >
+                    <span className="bg-brand-orange text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shrink-0">공지</span>
+                    <span className="font-medium text-brand-charcoal hover:text-brand-emerald truncate">{item.subject}</span>
+                    <span className="ml-auto text-sm text-gray-500 shrink-0 hidden sm:inline">{item.date}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {items.map((item) => {
+          {villaItems.map((item) => {
             const features = boardFeatures(item);
             return (
               <article key={item.wr_id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group">

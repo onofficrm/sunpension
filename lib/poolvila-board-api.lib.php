@@ -191,26 +191,40 @@ if (!function_exists('poolvila_board_normalize_image_url')) {
 if (!function_exists('poolvila_board_is_notice')) {
     function poolvila_board_is_notice($bo_table, $wr_id)
     {
+        $ids = poolvila_board_notice_ids($bo_table);
+        $wr_id = (int) $wr_id;
+
+        return $wr_id > 0 && in_array($wr_id, $ids, true);
+    }
+}
+
+if (!function_exists('poolvila_board_notice_ids')) {
+    /**
+     * @return int[]
+     */
+    function poolvila_board_notice_ids($bo_table)
+    {
         global $g5;
 
         $bo_table = poolvila_board_sanitize_table($bo_table);
-        $wr_id = (int) $wr_id;
-        if ($bo_table === '' || $wr_id <= 0) {
-            return false;
+        if ($bo_table === '') {
+            return array();
         }
 
         $board_row = sql_fetch(" select bo_notice from {$g5['board_table']} where bo_table = '" . sql_real_escape_string($bo_table) . "' ");
         if (empty($board_row['bo_notice'])) {
-            return false;
+            return array();
         }
 
+        $ids = array();
         foreach (explode(',', (string) $board_row['bo_notice']) as $nid) {
-            if ((int) trim($nid) === $wr_id) {
-                return true;
+            $nid = (int) trim($nid);
+            if ($nid > 0 && !in_array($nid, $ids, true)) {
+                $ids[] = $nid;
             }
         }
 
-        return false;
+        return $ids;
     }
 }
 
@@ -266,19 +280,38 @@ if (!function_exists('poolvila_board_api_list')) {
         $per_page = max(1, min(50, (int) $per_page));
         $from_record = ($page - 1) * $per_page;
         $write_table = $g5['write_prefix'] . $bo_table;
+        $notice_ids = poolvila_board_notice_ids($bo_table);
 
         $total_row = sql_fetch(" select count(*) as cnt from {$write_table} where wr_is_comment = 0 ");
         $total = isset($total_row['cnt']) ? (int) $total_row['cnt'] : 0;
 
+        // 공지는 페이지와 무관하게 목록 상단에 상시 표시
+        $notice_items = array();
+        if ($notice_ids) {
+            $in = implode(',', array_map('intval', $notice_ids));
+            $field_order = implode(',', array_map('intval', $notice_ids));
+            $notice_result = sql_query(" select * from {$write_table}
+                where wr_is_comment = 0 and wr_id in ({$in})
+                order by field(wr_id, {$field_order}) ");
+            while ($row = sql_fetch_array($notice_result)) {
+                $notice_items[] = poolvila_board_row_to_item($row, $bo_table, false);
+            }
+        }
+
+        $exclude_sql = '';
+        if ($notice_ids) {
+            $exclude_sql = ' and wr_id not in (' . implode(',', array_map('intval', $notice_ids)) . ') ';
+        }
+
         $sql = " select * from {$write_table}
-                 where wr_is_comment = 0
+                 where wr_is_comment = 0 {$exclude_sql}
                  order by wr_num, wr_reply
                  limit {$from_record}, {$per_page} ";
         $result = sql_query($sql);
 
-        $items = array();
+        $normal_items = array();
         while ($row = sql_fetch_array($result)) {
-            $items[] = poolvila_board_row_to_item($row, $bo_table, false);
+            $normal_items[] = poolvila_board_row_to_item($row, $bo_table, false);
         }
 
         return array(
@@ -287,7 +320,7 @@ if (!function_exists('poolvila_board_api_list')) {
             'total'    => $total,
             'page'     => $page,
             'per_page' => $per_page,
-            'items'    => $items,
+            'items'    => array_merge($notice_items, $normal_items),
         );
     }
 }
