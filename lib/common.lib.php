@@ -719,7 +719,13 @@ function html_purifier($html)
 
     $config = HTMLPurifier_Config::createDefault();
     // data/cache 디렉토리에 CSS, HTML, URI 디렉토리 등을 만든다.
-    $config->set('Cache.SerializerPath', G5_DATA_PATH . '/cache');
+    // FTP 배포 시 data/** 제외 등으로 캐시 폴더가 없으면 Warning이 게시판에 노출된다.
+    $cache_path = G5_DATA_PATH . '/cache';
+    if (!is_dir($cache_path)) {
+        @mkdir($cache_path, G5_DIR_PERMISSION, true);
+        @chmod($cache_path, G5_DIR_PERMISSION);
+    }
+    $config->set('Cache.SerializerPath', $cache_path);
     $config->set('HTML.SafeEmbed', false);
     $config->set('HTML.SafeObject', false);
     $config->set('Output.FlashCompat', false);
