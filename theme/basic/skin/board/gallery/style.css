@@ -97,9 +97,9 @@ box-shadow:2px 2px 3px 0px rgba(0,0,0,0.2)}
 .btn_bo_adm {float:left}
 .btn_bo_adm li {float:left;margin-right:5px}
 .btn_bo_adm input {padding:0 8px;border:0;background:#d4d4d4;color:#666;text-decoration:none;vertical-align:middle}
-.bo_notice td {background:#fff6fa !important;border-bottom:1px solid #f8e6ee}
-.bo_notice td a {font-weight:bold}
-.bo_notice .notice_icon {display:inline-block;line-height:25px;border-radius:5px;font-weight:bold;color:#f9267f}
+.bo_notice td {background:color-mix(in srgb, #F97316 6%, #fff) !important;border-bottom:1px solid color-mix(in srgb, #F97316 18%, #e2e8f0)}
+.bo_notice td a {font-weight:600;color:#0F172A}
+.bo_notice .notice_icon {display:inline-block;padding:0 8px;line-height:22px;border-radius:4px;font-weight:700;font-size:11px;color:#fff;background:#F97316}
 
 .more_opt {display:none;position:absolute;top:45px;right:0;background:#fff;border:1px solid #b8bfc4;z-index:999}
 .more_opt:before {content:"";position:absolute;top:-8px;right:13px;width:0;height:0;border-style:solid;border-width:0 6px 8px 6px;border-color:transparent transparent #b8bfc4 transparent}

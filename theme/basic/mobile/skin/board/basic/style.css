@@ -18,7 +18,7 @@
 #bo_list .td_date {width:60px;text-align:center}
 #bo_list .td_datetime {width:150px;text-align:center}
 #bo_list .td_mng {width:80px;text-align:center}
-#bo_list .notice_icon {display:inline-block;background:#fbe2e6;padding:0 5px;line-height:20px;border-radius:5px;font-weight:bold;font-size:11px;color:#f1364c}
+#bo_list .notice_icon {display:inline-block;background:#F97316;padding:0 8px;line-height:20px;border-radius:4px;font-weight:700;font-size:11px;color:#fff}
 #bo_list .bo_subject .fa-download {width:16px;line-height:16px;background:#ffefb9;color:#daae37;text-align:center;font-size:10px;border-radius:2px;vertical-align:baseline}
 #bo_list .bo_subject .fa-link {width:16px;line-height:16px;background:#edd3fd;color:#b451fd;text-align:center;font-size:10px;border-radius:2px;vertical-align:baseline}
 #bo_list .bo_subject .fa-heart {color:#ff0000;text-align:center;font-size:10px;border-radius:2px}
@@ -51,7 +51,7 @@
 /* 게시판 목록 공통 */
 #bo_list {}
 #bo_list li {background:#fff}
-#bo_list li.bo_notice {background:#fff6fa}
+#bo_list li.bo_notice {background:color-mix(in srgb, #F97316 6%, #fff)}
 
 .bo_fx {margin-bottom:5px;padding:0 10px}
 .bo_fx:after {display:block;visibility:hidden;clear:both;content:""}

@@ -69,6 +69,9 @@ include_once G5_PATH . '/head.sub.php';
   </form>
 
   <div class="note">
+    <strong>스킨 동기화</strong><br>
+    이미 생성된 게시판도 다시 실행하면 권장 스킨으로 맞춥니다.
+    (공지사항 → <code>basic-notice</code>)<br><br>
     <strong>AI 챗봇·일정 플래너</strong><br>
     서버의 <code>data/onoff-builder.config.php</code>에 <code>ONOFF_BUILDER_GEMINI_API_KEY</code>를 설정하면
     <code>/api/chat</code>, <code>/api/itinerary</code>가 동작합니다.<br><br>

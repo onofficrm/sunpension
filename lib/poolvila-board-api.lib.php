@@ -350,11 +350,6 @@ if (!function_exists('poolvila_board_install_one')) {
             return array('ok' => false, 'message' => '잘못된 게시판 ID');
         }
 
-        $exists = sql_fetch(" select bo_table from {$g5['board_table']} where bo_table = '" . sql_real_escape_string($bo_table) . "' ");
-        if (!empty($exists['bo_table'])) {
-            return array('ok' => true, 'message' => '이미 존재', 'bo_table' => $bo_table, 'skipped' => true);
-        }
-
         $bo_subject = trim((string) ($def['bo_subject'] ?? $bo_table));
         $skin = preg_replace('/[^a-z0-9_-]/i', '', (string) ($def['bo_skin'] ?? 'basic-clean'));
         $mobile_skin = preg_replace('/[^a-z0-9_-]/i', '', (string) ($def['bo_mobile_skin'] ?? $skin));
@@ -366,6 +361,23 @@ if (!function_exists('poolvila_board_install_one')) {
         }
         if (!is_dir(G5_MOBILE_PATH . '/skin/board/' . $mobile_skin)) {
             $mobile_skin = $skin;
+        }
+
+        $exists = sql_fetch(" select bo_table, bo_skin, bo_mobile_skin from {$g5['board_table']} where bo_table = '" . sql_real_escape_string($bo_table) . "' ");
+        if (!empty($exists['bo_table'])) {
+            // 기존 게시판도 poolvila 권장 스킨으로 동기화 (예: notice → basic-notice)
+            sql_query(" update {$g5['board_table']}
+                set bo_skin = '" . sql_real_escape_string($skin) . "',
+                    bo_mobile_skin = '" . sql_real_escape_string($mobile_skin) . "'
+                where bo_table = '" . sql_real_escape_string($bo_table) . "' ", false);
+
+            return array(
+                'ok'       => true,
+                'message'  => '스킨 동기화 (' . $skin . ')',
+                'bo_table' => $bo_table,
+                'skipped'  => true,
+                'synced'   => true,
+            );
         }
 
         $gr_id = 'community';

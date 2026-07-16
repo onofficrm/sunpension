@@ -16,16 +16,18 @@
    1. Design tokens (:root)
    -------------------------------------------------------------------------- */
 :root {
-  /* Brand & surface */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-secondary: #64748b;
+  /* Brand & surface — 세부풀빌라(poolvila) 톤 */
+  --color-primary: #10B981;
+  --color-primary-hover: #059669;
+  --color-secondary: #0F172A;
   --color-bg: #ffffff;
-  --color-surface: #f8fafc;
-  --color-text: #1e293b;
+  --color-surface: #FDFBF7;
+  --color-text: #0F172A;
   --color-muted: #64748b;
   --color-line: #e2e8f0;
   --color-on-primary: #ffffff;
+  --color-accent: #F97316;
+  --color-charcoal: #334155;
 
   /* Typography */
   --font-main: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', dotum, sans-serif;
@@ -2839,4 +2841,76 @@ html:has(.site-dock) {
   .page-style-guide .sg-palette {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* --------------------------------------------------------------------------
+   게시판·로그인 — poolvila 톤앤매너 (classic basic 스킨 핑크/블루 보정)
+   -------------------------------------------------------------------------- */
+#bo_list .bo_notice td,
+#bo_list li.bo_notice {
+  background: color-mix(in srgb, var(--color-accent, #F97316) 6%, #fff) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-accent, #F97316) 18%, var(--color-line, #e2e8f0)) !important;
+}
+
+#bo_list .bo_notice td a {
+  font-weight: 600;
+  color: var(--color-text, #0F172A);
+}
+
+#bo_list .bo_notice .notice_icon,
+#bo_list .notice_icon {
+  display: inline-block;
+  padding: 0 8px;
+  line-height: 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff !important;
+  background: var(--color-accent, #F97316) !important;
+}
+
+#bo_list tbody tr:hover {
+  border-left-color: var(--color-primary, #10B981);
+}
+
+#bo_list .bo_tit,
+#bo_list .bo_subject a {
+  color: var(--color-charcoal, #334155);
+}
+
+#bo_list .bo_tit:hover,
+#bo_list .bo_subject a:hover {
+  color: var(--color-primary, #10B981);
+}
+
+#bo_list .cnt_cmt {
+  background: color-mix(in srgb, var(--color-primary, #10B981) 12%, #fff) !important;
+  color: var(--color-primary, #10B981) !important;
+}
+
+#bo_cate a {
+  border-color: color-mix(in srgb, var(--color-primary, #10B981) 30%, #fff) !important;
+  color: var(--color-primary, #10B981) !important;
+}
+
+#bo_cate a:focus,
+#bo_cate a:hover,
+#bo_cate a:active,
+#bo_cate #bo_cate_on {
+  background: var(--color-primary, #10B981) !important;
+  border-color: var(--color-primary, #10B981) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+#ol_submit {
+  background: var(--color-primary, #10B981) !important;
+  border-color: var(--color-primary, #10B981) !important;
+  color: #fff !important;
+}
+
+#ol_svc a,
+#ol_after_info {
+  color: var(--color-primary, #10B981) !important;
+  border-color: color-mix(in srgb, var(--color-primary, #10B981) 35%, #fff) !important;
 }

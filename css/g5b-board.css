@@ -264,7 +264,7 @@
   display: inline-block;
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-sm, 4px);
-  background: var(--color-primary, #2563eb);
+  background: var(--color-accent, #F97316);
   color: var(--color-on-primary, #fff);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold, 700);
@@ -347,7 +347,7 @@
 
 .board-wrap .board-list__row--notice td,
 .board-wrap .bo_notice td {
-  background: color-mix(in srgb, var(--color-primary, #2563eb) 6%, transparent);
+  background: color-mix(in srgb, var(--color-accent, #F97316) 6%, transparent);
 }
 
 /* --------------------------------------------------------------------------
