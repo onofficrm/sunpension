@@ -21,13 +21,12 @@ export default function BoardPostDetail({ boTable, wrId, title }: BoardPostDetai
   return (
     <div className="bg-brand-beige min-h-screen py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
+        <a
+          href={`/bbs/board.php?bo_table=${boTable}`}
           className="inline-flex items-center gap-2 text-gray-500 hover:text-brand-navy mb-6 transition-colors font-medium"
         >
           <ArrowLeft className="w-4 h-4" /> 목록으로
-        </button>
+        </a>
 
         <article className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <header className="p-8 md:p-10 border-b border-gray-100">

@@ -12,3 +12,7 @@ $poolvila_gemini_lib = G5_LIB_PATH . '/poolvila-gemini-api.lib.php';
 if (is_file($poolvila_gemini_lib)) {
     include_once $poolvila_gemini_lib;
 }
+
+if (function_exists('poolvila_maybe_render_spa_board')) {
+    poolvila_maybe_render_spa_board();
+}

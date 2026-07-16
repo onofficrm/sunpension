@@ -12,6 +12,20 @@ import BoardDiary from './pages/BoardDiary';
 import BoardFree from './pages/BoardFree';
 import BoardNotice from './pages/BoardNotice';
 
+const SPA_BOARDS = new Set(['cebu', 'mactan', 'news', 'diary', 'free', 'notice']);
+
+function isSpaNavigable(url: URL): boolean {
+  const path = url.pathname;
+  if (path === '/' || path.endsWith('/index.php')) {
+    return true;
+  }
+  if (path.includes('/bbs/board.php')) {
+    const boTable = url.searchParams.get('bo_table') || '';
+    return SPA_BOARDS.has(boTable);
+  }
+  return false;
+}
+
 export default function App() {
   const [currentUrl, setCurrentUrl] = useState(window.location.pathname + window.location.search);
 
@@ -20,28 +34,49 @@ export default function App() {
       setCurrentUrl(window.location.pathname + window.location.search);
     };
 
-    // A simple way to intercept clicks on standard anchors for the SPA demo
     const handleLinkClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        return;
+      }
+
       const target = e.target as HTMLElement;
       const anchor = target.closest('a');
-      if (anchor && anchor.href && anchor.href.startsWith(window.location.origin)) {
-        const url = new URL(anchor.href);
-        // Allow anchor links on the same page
-        if (url.pathname === window.location.pathname && url.hash) {
-          return; // Let standard browser anchor scroll handle it
-        }
-        
-        e.preventDefault();
-        window.history.pushState({}, '', url.pathname + url.search + url.hash);
-        setCurrentUrl(url.pathname + url.search);
-        window.scrollTo(0, 0);
-        
-        if (url.hash) {
-          setTimeout(() => {
-            const element = document.getElementById(url.hash.substring(1));
-            if (element) element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
+      if (!anchor || !anchor.href) {
+        return;
+      }
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) {
+        return;
+      }
+
+      let url: URL;
+      try {
+        url = new URL(anchor.href, window.location.origin);
+      } catch {
+        return;
+      }
+
+      if (url.origin !== window.location.origin) {
+        return;
+      }
+
+      if (url.pathname === window.location.pathname && url.hash && url.search === window.location.search) {
+        return;
+      }
+
+      if (!isSpaNavigable(url)) {
+        return;
+      }
+
+      e.preventDefault();
+      window.history.pushState({}, '', url.pathname + url.search + url.hash);
+      setCurrentUrl(url.pathname + url.search);
+      window.scrollTo(0, 0);
+
+      if (url.hash) {
+        setTimeout(() => {
+          const element = document.getElementById(url.hash.substring(1));
+          if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       }
     };
 
@@ -54,7 +89,8 @@ export default function App() {
     };
   }, []);
 
-  // Simple routing logic based on URL
+  void currentUrl;
+
   const renderPage = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const boTable = searchParams.get('bo_table');

@@ -13,6 +13,64 @@ if (!function_exists('poolvila_allowed_boards')) {
     }
 }
 
+if (!function_exists('poolvila_maybe_render_spa_board')) {
+    /**
+     * /bbs/board.php?bo_table=* 직접 접속 시 그누보드 레이아웃 대신
+     * 홈과 동일한 poolvila SPA(헤더·푸터, 로그인 박스 없음)를 출력한다.
+     * ?classic=1 이면 기존 그누보드 스킨으로 폴백.
+     *
+     * @return bool 렌더 후 종료했으면 true
+     */
+    function poolvila_maybe_render_spa_board()
+    {
+        if (PHP_SAPI === 'cli') {
+            return false;
+        }
+
+        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper((string) $_SERVER['REQUEST_METHOD']) : 'GET';
+        if ($method !== 'GET' && $method !== 'HEAD') {
+            return false;
+        }
+
+        if (!empty($_GET['classic']) || !empty($_GET['g5_classic'])) {
+            return false;
+        }
+
+        $script = isset($_SERVER['SCRIPT_NAME']) ? (string) $_SERVER['SCRIPT_NAME'] : '';
+        $script_base = strtolower(basename($script));
+        if ($script_base !== 'board.php') {
+            return false;
+        }
+
+        $bo_table = isset($_GET['bo_table']) ? poolvila_board_sanitize_table($_GET['bo_table']) : '';
+        if ($bo_table === '' || !in_array($bo_table, poolvila_allowed_boards(), true)) {
+            return false;
+        }
+
+        if (!function_exists('onoff_builder_render_import_page')) {
+            $bootstrap = G5_PLUGIN_PATH . '/onoff-builder-bridge/bootstrap.php';
+            if (is_file($bootstrap)) {
+                include_once $bootstrap;
+            }
+        }
+
+        if (!function_exists('onoff_builder_home_enabled') || !onoff_builder_home_enabled()) {
+            return false;
+        }
+
+        $id = function_exists('onoff_builder_get_home_bridge_id')
+            ? onoff_builder_get_home_bridge_id()
+            : '';
+        if ($id === '' || !function_exists('onoff_builder_render_import_page')) {
+            return false;
+        }
+
+        onoff_builder_render_import_page($id);
+
+        return true;
+    }
+}
+
 if (!function_exists('poolvila_board_api_json')) {
     function poolvila_board_api_json(array $payload, $status = 200)
     {
